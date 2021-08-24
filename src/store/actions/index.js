@@ -3,8 +3,9 @@ export const conversationChanged = conversationId => ({
     conversationId
 });
 
-export const conversationsRequested = () => ({
-    type: 'CONVERSATIONS_REQUESTED'
+export const conversationsRequested = username => ({
+    type: 'CONVERSATIONS_REQUESTED',
+    payload: username
 });
 
 export const conversationDeleted = () => ({
@@ -16,12 +17,13 @@ export const newMessageAdded = textMessage => ({
     textMessage
 });
 
-export const messagesRequested = (conversationId, numberOfMessages, lastMessageId) => ({
+export const messagesRequested = (conversationId, numberOfMessages, lastMessageId, fromacc) => ({
     type: 'MESSAGES_REQUESTED',
     payload: {
         conversationId,
         numberOfMessages,
-        lastMessageId
+        lastMessageId,
+        fromacc
     }
 });
 

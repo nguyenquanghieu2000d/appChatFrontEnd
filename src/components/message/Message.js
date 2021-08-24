@@ -16,9 +16,9 @@ const Message = ({ isMyMessage, message }) => {
             <div className="message-content">
                 {imageThumbnail}
                 <div className="message-text">
-                    {message.messageText}
+                    {message.message}
                 </div>
-                <div className="message-time">{message.createdAt}</div>
+                <div className="message-time">{message.date}</div>
             </div>
         </div>
     );

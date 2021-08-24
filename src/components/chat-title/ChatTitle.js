@@ -6,11 +6,10 @@ import './ChatTitle.scss';
 
 const ChatTitle = ({ selectedConversation, onDeleteConversation }) => {
     let chatTitleContents = null;
-
     if (selectedConversation) {
         chatTitleContents = (
             <>
-                <span>{ selectedConversation.title }</span>
+                <span>{ selectedConversation.hoten }</span>
                 <div onClick={ () => { onDeleteConversation(); } } title="Delete Conversation">
                     <TrashIcon />
                 </div>

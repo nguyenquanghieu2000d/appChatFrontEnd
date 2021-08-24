@@ -12,10 +12,11 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
-import {Snackbar} from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import {UserApi} from "../../api/UserApi";
-
+import {useToasts} from 'react-toast-notifications';
+import {useNavigate} from "react-router-dom";
+import { useCookies } from 'react-cookie';
 function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
@@ -67,27 +68,11 @@ function Alert(props) {
 
 export default function LoginForm() {
     const classes = useStyles();
-
-    const logger = [
-        {
-            "severity": "error"
-        },
-        {
-            "severity": "warning"
-        },
-        {
-            "severity": "info"
-        },
-        {
-            "severity": "success"
-        }
-    ]
-
+    const {addToast} = useToasts();
     const [username, setUsername] = React.useState("quanghieu333");
     const [password, setPassword] = React.useState("quanghieu12345");
-    const [message, setMessage] = React.useState("");
-    const [open, setOpen] = React.useState(false);
-
+    const navigate = useNavigate()
+    const [cookies, setCookie] = useCookies(['user']);
 
     const onChangeUsername = (e) => {
         setUsername(e.target.value)
@@ -97,6 +82,12 @@ export default function LoginForm() {
         setPassword(e.target.value)
     }
 
+    const [open, setOpen] = React.useState(false);
+
+    const isLogin = () => {
+        if(cookies.user !== undefined)
+            navigate("/message")
+    }
 
     const handleClick = async (e) => {
         e.preventDefault();
@@ -104,22 +95,21 @@ export default function LoginForm() {
             "username": username,
             "password": password
         }
-        const response = await UserApi.login(data);
-        alert(JSON.stringify(response))
-        // setMessage(response.)
-        setOpen(true);
-    };
-
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
+        try {
+            const response = await UserApi.login(data)
+            const t = new Date();
+            t.setSeconds(t.getSeconds() + 1000);
+            setCookie('user', response, {expires: t})
+            addToast("Đăng nhập thành công", {appearance: 'success'});
+            navigate("/message")
+        } catch (error) {
+            addToast(error.response.data, {appearance: 'error'});
         }
-        setOpen(false);
     };
+
 
     useEffect(() => {
-
+        isLogin()
     }, []);
 
 
@@ -128,17 +118,6 @@ export default function LoginForm() {
             <CssBaseline/>
 
             {/*Snackbar start*/}
-            <div className={"snackBarContainer"}>
-                {
-                    message ? logger.map((value, index) => {
-                        return <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-                            <Alert onClose={handleClose} severity={index.severity}>
-                                {message}
-                            </Alert>
-                        </Snackbar>
-                    }) : <></>
-                }
-            </div>
 
             {/*<Alert severity="error">This is an error message!</Alert>*/}
             {/*<Alert severity="warning">This is a warning message!</Alert>*/}
@@ -175,6 +154,7 @@ export default function LoginForm() {
                             required
                             fullWidth
                             name="password"
+
                             value={password}
                             label="Mật khẩu"
                             type="password"
@@ -198,7 +178,7 @@ export default function LoginForm() {
                         </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
+                                <Link onClick={isLogin} href="#" variant="body2">
                                     Quên mật khẩu ?
                                 </Link>
                             </Grid>
